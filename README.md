@@ -1,59 +1,23 @@
-# FrontendCloudnative
+k# Frontend Cloud Native - Angular
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.3.
+Aplicacion Angular 22 con login mediante Keycloak (IDaaS), JWT adjunto a las llamadas al backend, y vistas para crear y listar pedidos.
 
-## Development server
+## Requisitos
+- Node 20.19+ y Angular CLI
+- Backend levantado (ver repositorio `backend-cloudnative`): Keycloak en `localhost:8080` y `ms-pedidos` en `localhost:8081`
 
-To start a local development server, run:
-
+## Puesta en marcha
 ```bash
+npm install
 ng serve
 ```
+Abrir http://localhost:4200. La app redirige al login de Keycloak (realm `cloudnative`, cliente `angular-app`).
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Estructura
+- `auth.service.ts`: login con Keycloak (PKCE S256) y obtencion del JWT
+- `auth.interceptor.ts`: adjunta `Authorization: Bearer <JWT>` a las llamadas a `ms-pedidos`
+- `pedido.service.ts`: llamadas HTTP (`POST` y `GET /api/pedidos`)
+- `pedido-crear.ts` y `pedido-lista.ts`: vistas de crear pedido y listado
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Flujo
+Al crear un pedido, `ms-pedidos` lo guarda en la BD y publica un mensaje en RabbitMQ; `ms-notificaciones` lo consume de forma asincrona.
